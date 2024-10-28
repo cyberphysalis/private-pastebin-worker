@@ -39,6 +39,11 @@
     <div id='paste-setting-model' class="hidden">
       <div id='paste-setting-panel'>
           <h2>Settings</h2>
+          <!-- add a checkbox to enable/disable private mode-->
+          <div class='label-line' id='paste-private-panel' >
+              <input type='checkbox' name='paste-private' id='paste-private-checkbox'>
+              <label for='paste-private-checkbox' class='radio-label'>Upload in private mode</label>
+          </div>
           <div id='paste-expiration-panel' class='paste-setting-subitem-panel'>
               <input list='expiration-choices' type='text' min='60' step='1' name='paste-expiration'
                      id='paste-expiration-input' placeholder='Expiration (secs)' value='7d'>

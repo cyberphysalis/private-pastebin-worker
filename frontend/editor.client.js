@@ -66,6 +66,7 @@ window.addEventListener('DOMContentLoaded', () => {
   let expiration = $('#paste-expiration-input').val()
   let passwd = ''
   let customName = '', adminUrl = '', file = null
+  let isPrivate = false
 
   const NAME_REGEX = /^[a-zA-Z0-9+_\-\[\]*$@,;]{3,}$/
   const EXPIRE_REGEX = /^\d+\s*[smhdwMY]?$/
@@ -173,6 +174,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
   pasteEditArea.on('input', updateButtons)
 
+  $('#paste-private-checkbox').on('input', event => {
+    isPrivate = event.target.checked
+  })
+
   $('#paste-expiration-input').on('input', event => {
     expiration = event.target.value
     updateButtons()
@@ -243,6 +248,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     if (expiration.length > 0) fd.append('e', expiration)
     if (passwd.length > 0) fd.append('s', passwd)
+    if (isPrivate) fd.append('p', 'true')
 
     $.ajax({
       method: 'PUT',
@@ -271,6 +277,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     if (urlType === 'long') fd.append('p', 'true')
     if (urlType === 'custom') fd.append('n', customName)
+    if (isPrivate) fd.append('p', 'true')
 
     $.post({
       url: base_url,

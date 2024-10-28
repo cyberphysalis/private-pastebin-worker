@@ -15,7 +15,7 @@ rules = [
 
 [[routes]]
 # Refer to https://developers.cloudflare.com/workers/wrangler/configuration/#routes
-pattern = "shz.al"
+pattern = "pb.nu7.fun"
 custom_domain = true
 
 [[kv_namespaces]]
@@ -24,10 +24,10 @@ id = "e8402dd525554ee3ba059cdd77330aaf"  # id of your KV namespace
 
 [vars]
 # must be consistent with your routes
-BASE_URL = "https://shz.al"
+BASE_URL = "https://pb.nu7.fun"
 
 # url to repo, displayed in the index page
-REPO = "https://github.com/SharzyL/pastebin-worker"
+REPO = "https://github.com/cyberphysalis/private-pastebin-worker"
 
 # url to the favicon
 FAVICON = "https://sharzy.in/favicon-32x32.png"

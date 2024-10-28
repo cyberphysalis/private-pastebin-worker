@@ -3,7 +3,7 @@
   "name": "pb",
   "version": "1.0.0",
   "description": "Pastebin based on Cloudflare worker",
-  "repository": "https://github.com/SharzyL/pastebin-worker",
+  "repository": "https://github.com/cyberphysalis/private-pastebin-worker",
   "type": "module",
   "scripts": {
     "deploy": "wrangler deploy",
