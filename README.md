@@ -1,4 +1,22 @@
-# Pastebin-worker
+# Private-Pastebin-worker
+
+This is a fork of [pastebin](https://github.com/SharzyL/pastebin-worker/), thanks to the original author for the work.
+
+## Why fork?
+
+The original project is helpful in share temporary data. But I sometimes also need to store not only instant but sensitive messages.
+
+This fork mainly works with the private deployment. Only the admin can upload the paste, and *if the paste is private, it only can be see by the admin.* (this is different from the original project, where everyone can see the paste)
+
+I also add a page `/m` for admin to manage the pastes, easy to search and delete.
+
+Below is the forked page structure.
+
++ `/`  the main page for introduction
++ `/e` the page for uploading and updating paste (requires auth)
++ `/m` the management page for admin (requires auth)
+
+# Original README
 
 This is a pastebin that can be deployed on Cloudflare workers. Try it on [shz.al](https://shz.al). 
 

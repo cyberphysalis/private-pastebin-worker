@@ -15,12 +15,11 @@ async function createPaste(env, content, isPrivate, expire, short, createDate, p
   const now = new Date().toISOString()
   createDate = createDate || now
   passwd = passwd || genRandStr(params.ADMIN_PATH_LEN)
-  const short_len = isPrivate ? params.PRIVATE_RAND_LEN : params.RAND_LEN
 
   // repeat until finding an unused name
   if (short === undefined) {
     while (true) {
-      short = genRandStr(short_len)
+      short = genRandStr(params.RAND_LEN)
       if ((await env.PB.get(short)) === null) break
     }
   }
@@ -31,6 +30,7 @@ async function createPaste(env, content, isPrivate, expire, short, createDate, p
       passwd: passwd,
       filename: filename,
       lastModified: now,
+      isPrivate: isPrivate,
     },
   }
 
@@ -62,12 +62,12 @@ function suggestUrl(content, filename, short, baseUrl) {
 }
 
 export async function handlePostOrPut(request, env, ctx, isPut) {
-  if (!isPut) {  // only POST requires auth, since PUT request already contains auth
-    const authResponse = verifyAuth(request, env)
-    if (authResponse !== null) {
-      return authResponse
-    }
+  //if (!isPut) {  // only POST requires auth, since PUT request already contains auth
+  const authResponse = verifyAuth(request, env)
+  if (authResponse !== null) {
+    return authResponse
   }
+  //}
 
   const contentType = request.headers.get("content-type") || ""
   const url = new URL(request.url)
@@ -136,13 +136,13 @@ export async function handlePostOrPut(request, env, ctx, isPut) {
       throw new WorkerError(404, `paste of name '${short}' is not found`)
     } else {
       const date = item.metadata?.postedAt
-      if (passwd !== item.metadata?.passwd) {
-        throw new WorkerError(403, `incorrect password for paste '${short}`)
-      } else {
-        return makeResponse(
-          await createPaste(env, content, isPrivate, expirationSeconds, short, date, newPasswd || passwd, filename),
-        )
-      }
+      //if (passwd !== item.metadata?.passwd) {
+      //  throw new WorkerError(403, `incorrect password for paste '${short}`)
+      //} else {
+      return makeResponse(
+        await createPaste(env, content, isPrivate, expirationSeconds, short, date, newPasswd || passwd, filename),
+      )
+      //}
     }
   } else {
     let short = undefined

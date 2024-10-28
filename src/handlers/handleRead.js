@@ -5,11 +5,6 @@ import { getType } from "mime/lite.js"
 import { makeMarkdown } from "../pages/markdown.js"
 import { makeHighlight } from "../pages/highlight.js"
 
-function staticPageCacheHeader(env) {
-  const age = env.CACHE_STATIC_PAGE_AGE
-  return age ? { "cache-control": `public, max-age=${age}` } : {}
-}
-
 function pasteCacheHeader(env) {
   const age = env.CACHE_PASTE_AGE
   return age ? { "cache-control": `public, max-age=${age}` } : {}
@@ -29,16 +24,30 @@ export async function handleGet(request, env, ctx) {
   }
 
   // return the editor for admin URL
-  const staticPageContent = getStaticPage((passwd.length > 0) ? "/" : url.pathname, env)
-  if (staticPageContent) {
-    // access to all static pages requires auth
+  const staticPageResponse = getStaticPage(url.pathname, request, env)
+  if (staticPageResponse) {
+    return staticPageResponse
+  }
+
+  // handle admin api 
+  if (url.pathname === "/admin/keys") {
     const authResponse = verifyAuth(request, env)
     if (authResponse !== null) {
-      return authResponse
+      throw new WorkerError(403, "API Forbidden") 
+    } else {
+      const cursor = url.searchParams.get("cursor")
+      if (cursor === null) {
+        const keys = await env.PB.list({limit: 20})
+        return new Response(JSON.stringify(keys), {
+          headers: { "content-type": "application/json;charset=UTF-8" },
+        })
+      } else {
+        const keys = await env.PB.list({limit: 20, cursor: cursor})
+        return new Response(JSON.stringify(keys), {
+          headers: { "content-type": "application/json;charset=UTF-8" },
+        })
+      }
     }
-    return new Response(staticPageContent, {
-      headers: { "content-type": "text/html;charset=UTF-8", ...staticPageCacheHeader(env) },
-    })
   }
 
   const mime = url.searchParams.get("mime") || getType(ext) || "text/plain"
@@ -50,6 +59,18 @@ export async function handleGet(request, env, ctx) {
   // when paste is not found
   if (item.value === null) {
     throw new WorkerError(404, `paste of name '${short}' not found`)
+  }
+
+
+  // check if the paste is private, and if so, check the auth or the password
+  // un-authenticated access to private paste will get 404
+  if (item.metadata?.isPrivate){
+    if (item.metadata?.passwd !== passwd) {
+      const authResponse = verifyAuth(request, env)
+      if (authResponse !== null) {
+        return authResponse
+      } 
+    }
   }
 
   // check `if-modified-since`

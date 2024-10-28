@@ -7,19 +7,32 @@
     <style media='screen'>
         {{ROOT_CSS}}
     </style>
+    <style media='screen'>
+        button {
+          border: 1px solid;
+        }
+    </style>
 </head>
 <html lang='en'>
 <body>
 <div class='px-3 my-5 markdown-body'>
-    <h1>Yet Another Pastebin</h1>
-    <p>This is an open source pastebin deployed on Cloudflare Workers. </p>
-    <p><b>Usage</b>: paste any text here, submit, then share it with URL. </p>
-    <p><b>Warning</b>: only for temporary share, files will be deleted without notice!</p>
-    <p>But for sorry, this is a private deploy, you can have a try on <a href="https://shz.al/">shz.al</a>.</p>
-    <p>Refer to <a href='{{REPO}}'>GitHub</a> for more details.</p>
-
-    <p><a href="/e">Click to paste</a></p>
-    <p><a href="/m">Click to manage</a></p>
+    <h1>Manage Pastebin Keys</h1>
+    <!-- list all keys in table with headers of name,passwd,last_modified, posted_at, actions-->
+    <div>
+        <table id='key-table'>
+            <thead>
+            <tr>
+                <th>Key</th>
+                <th>Password</th>
+                <th>Last Modified</th>
+                <th>Posted At</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id='key-table-body'></tbody>
+        </table>
+        <button id='more-keys-button' class='long-button px-3 py-2 my-1 hidden'>More Keys</button>
+    </div>
 </div>
 <footer class='px-3 my-2 text-center'>
     <p>
@@ -30,7 +43,7 @@
 </footer>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js'></script>
 <script>
-    {{INDEX_JS}}
+    {{ADMIN_JS}}
 </script>
 </body>
 </html>

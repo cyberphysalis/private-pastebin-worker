@@ -37,7 +37,7 @@ window.addEventListener('DOMContentLoaded', () => {
   function isAdminUrlLegal(url) {
     try {
       url = new URL(url)
-      return url.origin === base_url && url.pathname.indexOf(':') >= 0
+      return url.origin === base_url && url.pathname.slice(1).indexOf('/') === -1
     } catch (e) {
       if (e instanceof TypeError) {
         return false
@@ -70,19 +70,29 @@ window.addEventListener('DOMContentLoaded', () => {
   const NAME_REGEX = /^[a-zA-Z0-9+_\-\[\]*$@,;]{3,}$/
   const EXPIRE_REGEX = /^\d+\s*[smhdwMY]?$/
   const submitButton = $('#submit-button')
+  const settingModel = $('#paste-setting-model')
+  const submitConfirmButton = $('#submit-confirm-button')
+  const submitCancelButton = $('#submit-cancel-button')
   const deleteButton = $('#delete-button')
   const pasteEditArea = $('#paste-textarea')
   const submitErrMsg = $('#submit-error-msg')
+  const submitConfirmErrMsg = $('#submit-confirm-error-msg')
 
   function disableSubmitButton(reason) {
     submitButton.removeClass('enabled')
     submitErrMsg.text(reason)
   }
 
+  function disableSubmitConfirmButton(reason) {
+    submitConfirmButton.removeClass('enabled')
+    submitConfirmErrMsg.text(reason)
+  }
+
   function updateButtons() {
     const pasteNotEmpty = inputType === 'edit'
       ? pasteEditArea.prop('value').length > 0
       : file !== null
+    
     let expirationValid = EXPIRE_REGEX.test(expiration)  // TODO: verify it
     if (!expiration) {
       expirationValid = true
@@ -90,33 +100,40 @@ window.addEventListener('DOMContentLoaded', () => {
     const nameValid = urlType !== 'custom' || NAME_REGEX.test(customName)
     const adminUrlValid = urlType !== 'admin' || isAdminUrlLegal(adminUrl)
 
+    // check if the submit button should be enabled
     if (!pasteNotEmpty) {
       disableSubmitButton('Paste is empty')
-    } else if (!expirationValid) {
-      disableSubmitButton(`Expiration “${expiration}” not valid`)
-    } else if (!nameValid) {
-      disableSubmitButton(`The customized URL should satisfy regex ${NAME_REGEX}`)
-    } else if (!adminUrlValid) {
-      disableSubmitButton(`Admin URL “${adminUrl}” not valid`)
     } else {
       submitButton.addClass('enabled')
       submitErrMsg.text('')
     }
 
+    // check if the submit confirm button should be enabled
+    if (!expirationValid) {
+      disableSubmitConfirmButton(`Expiration “${expiration}” not valid`)
+    } else if (!nameValid) {
+      disableSubmitConfirmButton(`The customized URL should satisfy regex ${NAME_REGEX}`)
+    } else if (!adminUrlValid) {
+      disableSubmitConfirmButton(`Admin URL “${adminUrl}” not valid`)
+    } else {
+      submitConfirmButton.addClass('enabled')
+      submitConfirmErrMsg.text('')
+    }
+
     if (urlType === 'admin') {
-      submitButton.text('Update')
+      submitConfirmButton.text('Update')
       deleteButton.removeClass('hidden')
     } else {
-      submitButton.text('Submit')
+      submitConfirmButton.text('Submit')
       deleteButton.addClass('hidden')
     }
 
     if (adminUrlValid) {
       deleteButton.addClass('enabled')
-      submitButton.prop('title', '')
+      submitConfirmButton.prop('title', '')
     } else {
       deleteButton.removeClass('enabled')
-      submitErrMsg.text(`The admin URL should start with “${base_url}” and contain a colon`)
+      submitConfirmErrMsg.text(`The admin URL should be “${base_url}” followed by paste name`)
     }
   }
 
@@ -183,12 +200,30 @@ window.addEventListener('DOMContentLoaded', () => {
   // submit the form
   submitButton.on('click', () => {
     if (submitButton.hasClass('enabled')) {
+      // display setting model
+      settingModel.removeClass('hidden')
+    }
+  })
+
+  submitConfirmButton.on('click', () => {
+    if (submitConfirmButton.hasClass('enabled')) {
       if (urlType === 'admin') {
         putPaste()
       } else {
         postPaste()
       }
     }
+  })
+
+  submitCancelButton.on('click', () => {
+    settingModel.addClass('hidden')
+    // set the radio button back to checked
+    //if (!submitButton.hasClass('enabled')) {
+    //  submitButton.addClass('enabled')
+    //}
+    //$("#paste-url-short-radio").prop("checked", true)
+    //urlType = 'short'
+    //updateButtons()
   })
 
   deleteButton.on('click', () => {
@@ -280,6 +315,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (uploaded.expire) {
       $('#uploaded-expiration').prop('value', uploaded.expire)
     }
+    settingModel.addClass('hidden')
     updateButtons()
   }
 
@@ -309,13 +345,14 @@ window.addEventListener('DOMContentLoaded', () => {
     $('#submit-button').addClass('enabled')
   }
 
+  // in this fork，only admin can edit paste
   function initAdmin() {
     const { role, short, passwd, ext } = parsePath(location.pathname)
-    if (passwd.length > 0) {
-      $('#paste-url-admin-radio').click()
-      $('#paste-admin-url-input').val(location.href)
+    if (role === 'e') {
       urlType = 'admin'
-      adminUrl = location.href
+      adminUrl = `${base_url}/${short}`
+      $('#paste-url-admin-radio').click()
+      $('#paste-admin-url-input').val(adminUrl)
       updateButtons()
       $.ajax({
         url: "/" + short,
@@ -327,6 +364,5 @@ window.addEventListener('DOMContentLoaded', () => {
       })
     }
   }
-
   initAdmin()
 })

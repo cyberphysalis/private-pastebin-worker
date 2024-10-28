@@ -20,7 +20,7 @@ custom_domain = true
 
 [[kv_namespaces]]
 binding = "PB"  # do not touch this
-id = "cc398e983a234aa19de5ea6af571a483"  # id of your KV namespace
+id = "e8402dd525554ee3ba059cdd77330aaf"  # id of your KV namespace
 
 [vars]
 # must be consistent with your routes
@@ -43,3 +43,6 @@ CACHE_STATIC_PAGE_AGE = 7200
 
 # Cache-Control max-age for static pages
 CACHE_PASTE_AGE = 600
+
+[vars.BASIC_AUTH]
+user = "passwd"
