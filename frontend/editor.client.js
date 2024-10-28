@@ -172,7 +172,13 @@ window.addEventListener('DOMContentLoaded', () => {
     updateTabBar()
   })
 
-  pasteEditArea.on('input', updateButtons)
+  pasteEditArea.on('input', event => {
+    // set the element height to fit the content
+    // https://stackoverflow.com/questions/2803880/is-there-a-way-to-get-a-textarea-to-stretch-to-fit-its-content-without-using-php
+    event.target.style.height = ''
+    event.target.style.height = event.target.scrollHeight + 'px'
+    updateButtons()
+  })
 
   $('#paste-private-checkbox').on('input', event => {
     isPrivate = event.target.checked
@@ -313,6 +319,9 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderUploaded(uploaded) {
+    // the uploaded-panel is in the top, scroll to the top
+    window.scrollTo(0, 0)
+
     $('#paste-uploaded-panel').removeClass('hidden')
     $('#uploaded-url').prop('value', uploaded.url)
     $('#uploaded-admin-url').prop('value', uploaded.admin)
