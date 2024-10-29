@@ -55,8 +55,8 @@ class vFileShim {
   }
 }
 
-export function makeMarkdown(content) {
-  const metadata = { title: defaultTitle, description: "" }
+export function makeMarkdown(content, title) {
+  const metadata = { title: title ? title : defaultTitle, description: "" }
   const convertedHtml = unified()
     .use(remarkParse)
     .use(remarkGfm)
