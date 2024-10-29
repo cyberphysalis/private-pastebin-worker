@@ -172,11 +172,16 @@ window.addEventListener('DOMContentLoaded', () => {
     updateTabBar()
   })
 
+  const pasteEditAreaCopy = $("#paste-textarea-copy")
   pasteEditArea.on('input', event => {
     // set the element height to fit the content
     // https://stackoverflow.com/questions/2803880/is-there-a-way-to-get-a-textarea-to-stretch-to-fit-its-content-without-using-php
-    event.target.style.height = ''
-    event.target.style.height = event.target.scrollHeight + 'px'
+    // this featur can also be implemented by using the css property "field-sizing: content", but it is not supported by all browsers
+    // pasteEditAreaCopy is used to calculate the height of the real textarea, it has the same value as the pasteEditArea
+    pasteEditAreaCopy.prop('value', event.target.value)
+    // scrollHeight is the height of the content
+    const sh = pasteEditAreaCopy.prop('scrollHeight')
+    event.target.style.height = sh + 'px'
     updateButtons()
   })
 

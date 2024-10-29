@@ -53,19 +53,28 @@
 
 .paste-tab-page {
     display: none;
+    position: relative;
 }
 
 .paste-tab-page.enabled {
     display: inherit;
 }
 
-#paste-textarea {
+#paste-textarea, #paste-textarea-copy{
     width: 100%;
+    min-height: 20em;
     font-family: monospace;
     font-size: 12px;
     border: none;
     outline: none;
     resize: vertical;
+}
+
+#paste-textarea-copy {
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 #paste-file-upload {
